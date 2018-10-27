@@ -54,6 +54,7 @@ class QLearningAgent(ReinforcementAgent):
         util.raiseNotDefined()
 
 
+
     def computeValueFromQValues(self, state):
         """
           Returns max_action Q(state,action)
