@@ -46,23 +46,18 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.values = util.Counter()  # A Counter is a dict with default 0
         self.V = util.Counter()
 
-
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        original_states = self.mdp.getStates()
-        states = original_states[:]
-
         # Setting initial values
-        for i in range(0, iterations):
-            self.V = self.values.copy()
-            for s in states:
+        for _ in range(iterations):
+            V = self.values.copy()
+            for s in self.mdp.getStates():
                 if self.mdp.isTerminal(s):
                     continue
-                possibleActions = mdp.getPossibleActions(s)
-                actions_value = []
-                for a in possibleActions:
-                    actions_value.append(self.computeQValueFromValues(s, a))
-                self.values[s] = max(actions_value or [0])
+                actions = self.mdp.getPossibleActions(s)
+                bestValue = max([self.getQValue(s, a) for a in actions])
+                V[s] = bestValue
+            self.values = V
 
     def getValue(self, state):
         """
@@ -80,7 +75,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         q_value = 0
         for (nextState, possibility) in stateProb:
             q_value += possibility * (
-                        self.mdp.getReward(state, action, nextState) + self.discount * self.V[nextState])
+                        self.mdp.getReward(state, action, nextState) + self.discount * self.values[nextState])
         return q_value
 
     def computeActionFromValues(self, state):
@@ -93,24 +88,13 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        possibleActions = self.mdp.getPossibleActions(state)
-        max_value = -1
-        action = None
-        if len(possibleActions) != 0:
-            for a in possibleActions:
-                stateProb = self.mdp.getTransitionStatesAndProbs(state, a)
-                next_state = None
-                possibility = 0
-                for (s, p) in stateProb:
-                    if p > possibility:
-                        next_state = s
-                        possibility = p
-                if self.values[next_state] > max_value:
-                    action = a
-                    max_value = self.values[next_state]
-            return action
-        else:
-            return None
+        policies = util.Counter()
+        for action in self.mdp.getPossibleActions(state):
+            # how good is an action = q-value (which considers all possible outcomes)
+            policies[action] = self.getQValue(state, action)
+
+        # return the best action, e.g. 'north'
+        return policies.argMax()
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
