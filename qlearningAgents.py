@@ -65,7 +65,7 @@ class QLearningAgent(ReinforcementAgent):
         legalAction = self.getLegalActions(state)
         if len(legalAction) == 0:
             return 0.0
-        return max(self.values[(state, a)] for a in legalAction)
+        return max(self.getQValue(state, a) for a in legalAction)
 
     def computeActionFromQValues(self, state):
         """
@@ -168,6 +168,7 @@ class ApproximateQAgent(PacmanQAgent):
        and update.  All other QLearningAgent functions
        should work as is.
     """
+
     def __init__(self, extractor='IdentityExtractor', **args):
         self.featExtractor = util.lookup(extractor, globals())()
         PacmanQAgent.__init__(self, **args)
@@ -181,15 +182,30 @@ class ApproximateQAgent(PacmanQAgent):
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        features = self.featExtractor.getFeatures(state, action)
+
+        sum = 0
+        for feature, value in features.iteritems():
+            sum += self.weights[feature] * value
+        return sum
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        '''newValue = reward + self.discount * self.computeValueFromQValues(nextState)
+        oldValue = self.getQValue(state, action)
+        difference = newValue - oldValue
+
+        features = self.featExtractor.getFeatures(state, action)
+        for feature, value in features.iteritems():
+            self.weights[feature] += self.alpha * difference * features[feature]'''
+
+        next_optimal_q = self.computeValueFromQValues(nextState)
+        now_q = self.getValue(state)
+        features = self.featExtractor.getFeatures(state, action)
+        for f, v in features.iteritems():
+            self.weights[f] += self.alpha * (reward + self.discount * next_optimal_q - now_q) * features[f]
 
     def final(self, state):
         "Called at the end of each game."
