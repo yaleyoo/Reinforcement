@@ -118,7 +118,7 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         nextOptimal = self.computeValueFromQValues(nextState)
-        self.values[(state, action)] = (1 - self.alpha) * self.values[(state, action)] + self.alpha * \
+        self.values[(state, action)] = (1 - self.alpha) * self.getQValue(state, action) + self.alpha * \
                                        (reward + self.discount * nextOptimal)
 
     def getPolicy(self, state):
