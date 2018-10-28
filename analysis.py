@@ -21,7 +21,7 @@
 
 def question2():
     answerDiscount = 0.9
-    answerNoise = 0.2
+    answerNoise = 0
     return answerDiscount, answerNoise
 
 def question3a():
@@ -62,8 +62,8 @@ def question3e():
 def question6():
     answerEpsilon = 0.9
     answerLearningRate = 0.9
-    return answerEpsilon, answerLearningRate
-    # return 'NOT POSSIBLE'
+    # return answerEpsilon, answerLearningRate
+    return 'NOT POSSIBLE'
     # If not possible, return 'NOT POSSIBLE'
 
 if __name__ == '__main__':
